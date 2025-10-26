@@ -1,0 +1,293 @@
+C51 COMPILER V9.00   MAIN                                                                  10/26/2025 16:00:44 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: D:\Danpianji\C51\BIN\C51.EXE main.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include<reg52.h>
+   2          
+   3          sbit BEEP = P2^5;
+   4          sbit led = P2^2;
+   5          sbit play=P3^2;//K3???????????
+   6          sbit K4=P3^3;
+   7          unsigned char exit = 0;
+   8          unsigned char a,b,n,ge,shi;
+   9          
+  10          #define P       0       //?????
+  11          #define L1      1       //L???????
+  12          #define L1_     2       //_????????? ??#1
+  13          #define L2      3
+  14          #define L2_     4
+  15          #define L3      5
+  16          #define L4      6
+  17          #define L4_     7
+  18          #define L5      8
+  19          #define L5_     9
+  20          #define L6      10
+  21          #define L6_     11
+  22          #define L7      12
+  23          #define M1      13      //M???????
+  24          #define M1_     14
+  25          #define M2      15
+  26          #define M2_     16
+  27          #define M3      17
+  28          #define M4      18
+  29          #define M4_     19
+  30          #define M5      20
+  31          #define M5_     21
+  32          #define M6      22
+  33          #define M6_     23
+  34          #define M7      24
+  35          #define H1      25      //H???????
+  36          #define H1_     26
+  37          #define H2      27
+  38          #define H2_     28
+  39          #define H3      29
+  40          #define H4      30
+  41          #define H4_     31
+  42          #define H5      32
+  43          #define H5_     33
+  44          #define H6      34
+  45          #define H6_     35
+  46          #define H7      36
+  47          #define STOP 37
+  48          #define END 38
+  49          
+  50          unsigned int FreqTable[] = {
+  51                  0,
+  52                  63777,63872,63969,64054,64140,64216,64291,64360,64426,64489,64547,64603,
+  53                  64655,64704,64751,64795,64837,64876,64913,64948,64981,65012,65042,65070,
+  54                  65095,65120,65144,65166,65186,65206,65225,65242,65259,65274,65289,65303,0
+  55          };//65095???????????A4 440Hz
+C51 COMPILER V9.00   MAIN                                                                  10/26/2025 16:00:44 PAGE 2   
+
+  56          
+  57          unsigned char code tone[]={L1,L2,L3,L4,L5,L6,L7,M1,M2,M3,M4,M5,M6,M7,H1,H2,H3,H4,H5,H6,H7};
+  58          
+  59          unsigned char code Music[][2] = {       //?????????????1?????
+  60                  {P,1}, {L1,8},{P,4},{L1,8},{P,4},{L1,8},{P,4},{L1,8},{P,4},
+  61                  {L4,1},{L4,1},{L4,1},{L5,1}, {L5_,2},{L4,1},{L4,1}, {L4,1},{L5_,1},{L5,2}, {L4,1},{L4,1},{L4,1},{L4,1}, {
+             -L4,1},{L4,1},{L4,1},{L5,1}, {L5_,2},{L4,1},{L4,1}, {L4,1},{L5_,1},{L5,2}, {L4,1},{L4,1},{L4,1},{L4,1},//7-8节
+  62                  {L4,1},{L4,1},{L4,1},{L5,1}, {L5_,2},{L4,1},{L4,1}, {L4,1},{L5_,1},{L5,2}, {L4,1},{L4,1},{L4,1},{L4,1}, {
+             -L4,1},{L4,1},{L4,1},{L5,1}, {L5_,2},{L4,1},{L4,1}, {L7,1},{L5_,1},{L5,2}, {L4,1},{L4,1},{L4,1},{L4,1},//9-10节
+  63                  {L5,1},{L5,1},{L5,1},{L5_,1}, {L5,1},{L5,1},{L5,1},{L5_,1}, {L5,1},{L5,1},{L5,2}, {M1,2},{L5,2}, {L5_,8},
+             -{L5_,2},{L4,2},{M1,2},{L5,2}, //11-12节
+  64                  {L5_,8}, {L5_,2},{L5_,2},{L5_,2},{L6_,2}, {M1,8}, {M1_,2},{L2_,2}, {M1,2},{L6_,1},{L5_,1}, //13-14
+  65                  {L6_,8},  {L6_,2},{L6_,2}, {L6_,2},{M1,2}, {M1_,8}, {M1_,2},{L4,2},{M2_,2},{M1,2}, //15-16 
+  66                  {M1,2},{M1_,1},{M2_,1}, {M1_,2},{M1_,2},{M1_,2},{M2_,2}, {M4,3},{M5,1}, {M4,4}, {M5,2}, {M4,2},{M5,2}, {M
+             -5_,2},{M5,1},{M4,1}, //17-18
+  67                  {M5,8}, {M5,8}, {L5_,1},{L5,1},{L5_,1},{L6_,1}, {L5_,1},{L5,1},{L5_,1},{L6_,1},{L5_,1},{L5,1},{L5_,1},{L6
+             -_,1}, {M1,2},{L6_,2}, //19-20
+  68                  {L5_,1},{L5,1},{L5_,1},{L6_,1}, {L5_,1},{L5,1},{L5_,1},{L6_,1}, {L5_,1},{L5,1},{P,2}, {P,4}, {M1_,12},{P,
+             -4}, //21-22
+  69                  {P,4}, {M2_,4}, {M4,4}, {M2_,4}, {M5,2},{M5_,2}, {M6_,8}, {P,4},//23-24
+  70                  {M5_,2},{M5,2}, {M4,8}, {P,4}, {M4_,1},{M5_,1},{M6_,1},{H1,1}, {H1_,12}, {H1,1}, {H3,12},//25-27
+  71                  {L4,1},{L4,1},{L4,1},{L5,1}, {L5_,2},{L4,1},{L4,1}, {L4,1},{L5_,1},{L5,2}, {P,4}, {L4,1},{L4,1},{L4,1},{L
+             -5,1}, {L5_,2},{L4,1},{L4,1}, {L4,1},{L5_,1},{L5,2}, {P,4},//28-29
+  72                  {L4,1},{L4,1},{L4,1},{L5,1}, {L5_,2},{L4,1},{L4,1}, {L4,1},{L5_,1},{L5,2}, {P,4}, //30
+  73                  {STOP,1},{END,1}
+  74          };
+  75          
+  76          unsigned char code table[]={0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x77,0x7c,0x39,0x5e,0x79,0x7
+             -1};
+  77          unsigned char code clef[]={0x38,0x37,0x76};
+  78          
+  79          unsigned char FreqSelect,MusicSelect;
+  80          
+  81          void Delayms(unsigned int xms)  //@11.0592MHz
+  82          {
+  83   1              unsigned char data i, j;
+  84   1              while(xms--){
+  85   2                      i = 2;
+  86   2                      j = 199;
+  87   2                      do
+  88   2                      {
+  89   3                              while (--j);
+  90   3                      } while (--i);
+  91   2              }
+  92   1      }
+  93          
+  94          /**
+  95          * @brief        ?????0???????????????11.0592MHz
+  96            * @param      
+  97            * @retval     
+  98            */
+  99          
+ 100          void Timer0_Init(){
+ 101   1              TMOD &= 0xF0;
+ 102   1              TMOD |= 0x01;
+ 103   1              TH0 = 0xDC;
+ 104   1              TL0 = 0x00; //???10ms???
+ 105   1              TF0 = 0;
+ 106   1              TR0 = 1;
+ 107   1              ET0 = 1;        //????????
+ 108   1              EA = 1;         //?????????
+ 109   1              PT0 = 1;        //???????
+C51 COMPILER V9.00   MAIN                                                                  10/26/2025 16:00:44 PAGE 3   
+
+ 110   1      }
+ 111          /* ???????????????
+ 112          void Timer0_Routine() interrupt 1{
+ 113                  static unsigned int T0Count;
+ 114                  TH0 = 0xDC;
+ 115                  TL0 = 0x00;
+ 116                  T0Count++;
+ 117                  if(T0Count >= 100){
+ 118                          T0Count = 0;
+ 119          
+ 120                  }
+ 121          }
+ 122          */
+ 123          
+ 124          void back() interrupt 2
+ 125          {
+ 126   1              Delayms(10);
+ 127   1              
+ 128   1              exit = 1;
+ 129   1      }
+ 130          
+ 131          void Display()
+ 132          {
+ 133   1              MusicSelect=0;  
+ 134   1              while(exit == 0 && FreqSelect != END){
+ 135   2      //              if(FreqSelect == STOP){ //??????
+ 136   2      //                      TR0 = 0;
+ 137   2      //                      //while(1);
+ 138   2      //              }
+ 139   2                      //else{
+ 140   2                              FreqSelect = Music[MusicSelect][0];
+ 141   2                              Delayms(140 * Music[MusicSelect][1]); // 194BPM (60/194)/2=0.155s 155????????????????140??????????? 1Ϊ
+             -�ķ�֮һ�ģ���16��������
+ 142   2                              MusicSelect++;
+ 143   2                              
+ 144   2                              TR0 = 0;        //?????????
+ 145   2                              Delayms(5);
+ 146   2                              TR0 = 1;
+ 147   2                      //}
+ 148   2              }
+ 149   1              exit = 0;           // ?????????
+ 150   1          TR0 = 0;            // ???????
+ 151   1          BEEP = 1;           // ?????????????
+ 152   1              led=0;
+ 153   1              FreqSelect=0;
+ 154   1      }
+ 155          
+ 156          void judge()
+ 157          {
+ 158   1              P1=0x0f;//P1=0000 1111
+ 159   1              if(P1!=0x0f)
+ 160   1              {
+ 161   2                      Delayms(5);
+ 162   2                      if(P1!=0X0F)
+ 163   2                      {
+ 164   3                              switch(P1)//?????
+ 165   3                              {
+ 166   4                                      case 0x07: n=0; break;
+ 167   4                                      case 0x0b: n=1; break;
+ 168   4                                      case 0x0d: n=2; break;
+ 169   4                                      case 0x0e: n=3; break;
+ 170   4                              }
+C51 COMPILER V9.00   MAIN                                                                  10/26/2025 16:00:44 PAGE 4   
+
+ 171   3                              P1=0xf0;
+ 172   3                              switch(P1)//?????
+ 173   3                              {
+ 174   4                                      case 0x70: n=n; break;
+ 175   4                                      case 0xb0: n=n+4; break;
+ 176   4                                      case 0xd0: n=n+8; break;
+ 177   4                                      case 0xe0: n=n+12; break;
+ 178   4                              }
+ 179   3                      }P1=0x0f;a=1;
+ 180   2              }
+ 181   1      }
+ 182          
+ 183          void first()
+ 184          {
+ 185   1              if(n>11 && n!=15)
+ 186   1              {
+ 187   2                      shi=n-12;
+ 188   2              }
+ 189   1              if(n<8)
+ 190   1              {
+ 191   2                      ge=n;
+ 192   2              }
+ 193   1      }
+ 194          
+ 195          void xianshi()
+ 196          {
+ 197   1              P2=0x1c;
+ 198   1              P0=clef[shi];
+ 199   1              Delayms(10);
+ 200   1              P2=0x18;
+ 201   1              P0=table[ge];
+ 202   1              Delayms(10);
+ 203   1      }
+ 204                  
+ 205          void main()
+ 206          {
+ 207   1              EA=1;
+ 208   1              EX0=1;
+ 209   1              EX1=1;
+ 210   1              IT0=1;
+ 211   1              IT1=1;
+ 212   1              PX0=1;
+ 213   1              PX1=0;
+ 214   1              Timer0_Init();
+ 215   1              while(1)
+ 216   1              {
+ 217   2                      judge();
+ 218   2                      first();
+ 219   2                      xianshi();
+ 220   2                      if(a==1)
+ 221   2                      {
+ 222   3                              while(a==1)
+ 223   3                              {
+ 224   4                                      FreqSelect=tone[ge+shi*7-1];
+ 225   4                                      TR0=1;
+ 226   4                                      xianshi();
+ 227   4                                      if(P1==0x0f)
+ 228   4                                      {
+ 229   5                                              a=0;
+ 230   5                                      }
+ 231   4                              }TR0=0;
+ 232   3                      }
+C51 COMPILER V9.00   MAIN                                                                  10/26/2025 16:00:44 PAGE 5   
+
+ 233   2                      if(play==0)
+ 234   2                      {
+ 235   3                              Delayms(10);                                    
+ 236   3                              Display();
+ 237   3                      }       
+ 238   2              }
+ 239   1      }
+ 240          
+ 241          
+ 242          
+ 243          void Timer0_Routine() interrupt 1
+ 244          {
+ 245   1              if(FreqTable[FreqSelect])
+ 246   1              {
+ 247   2                      TH0 = FreqTable[FreqSelect] / 256;
+ 248   2                      TL0 = FreqTable[FreqSelect] % 256;
+ 249   2                      BEEP = !BEEP;
+ 250   2              }
+ 251   1      }
+ 252          
+ 253          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    501    ----
+   CONSTANT SIZE    =    448    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     84    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
