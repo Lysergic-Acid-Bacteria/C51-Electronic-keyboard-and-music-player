@@ -208,9 +208,13 @@ void main()
 			}TR0=0;
 		}
 		if(play==0)
-		{
+		{	
 			Delayms(10);					
-			Display();
+			play=1;
+			if(play==0)//多次判定以消抖
+			{
+				Display();
+			}
 		}//按下	K3后播放曲子
 	}
 }
@@ -226,5 +230,6 @@ void Timer0_Routine() interrupt 1
 		BEEP = !BEEP;
 	}
 }//蜂鸣器发声功能，根据选好的频率启停蜂鸣器以改变音调
+
 
 
